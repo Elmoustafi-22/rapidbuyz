@@ -1,9 +1,9 @@
 import "@/styles/globals.css";
-import { Merriweather } from "next/font/google";
+import { Playfair_Display } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
 import Header from "../components/header";
 
-const inter = Merriweather({ subsets: ["latin"], weight: '400' });
+const inter = Playfair_Display({ subsets: ["latin"], weight: "400" });
 
 export default function App({ Component, pageProps: { session, ...pageProps } }) {
   return (
