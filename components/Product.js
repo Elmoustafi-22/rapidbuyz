@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import Spinner from "./Spinner";
+import { ReactSortable } from "react-sortablejs"
 
 export default function Product(){
 
@@ -10,30 +12,71 @@ export default function Product(){
   const [title, setTitle ] = useState("") ;
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [Images, setImages] = useState([]);
+  const [images, setImages] = useState([]);
+
+  const [isUploading, setIsUploading] = useState(false)
+
+  const uploadImagesQueue = [];
 
   const createProduct = async (e) => {
     e.preventDefault();
+    
+    if (isUploading) {
+      await Promise.all(uploadImagesQueue);
+    }
 
-    const data = {title, description, price};
+    const data = {title, description, price, images};
     await axios.post('/api/products', data);
 
     setRedirect(true);
   };
+
+  async function uploadImages(e) {
+    const files = e.target?.files;
+    if (files?.length > 0) {
+      setIsUploading(true);
+      for (const file of files) {
+        const data = new FormData();
+        data.append("file", file);
+
+        uploadImagesQueue.push(
+          axios.post("/api/upload", data).then((res) => {
+            setImages((oldImages) => [...oldImages, ...res.data.links]);
+          })
+        );
+      }
+
+      await Promise.all(uploadImagesQueue);
+
+      setIsUploading(false);
+    } else {
+      return ('An error Occured while uploading')
+    }
+  }
 
   if (redirect) {
     router.push('/products');
     return null;
   }
 
+  const updateImagesOrder = (images) => {
+    setImages(images);
+  }
+
+  const handleDeleteImage = (index) => {
+    const updateImages = [...images];
+    updateImages.splice(index, 1);
+    setImages(updateImages);
+  }
+
     return (
       <>
         <form onSubmit={createProduct} className="mx-auto max-w-screen-sm">
-          <div class="mx-auto my-4">
+          <div className="mx-auto my-4">
             <div>
               <label
                 for="example1"
-                class="mb-1 block text-lg font-medium text-gray-700 py-2"
+                className="mb-1 block text-lg font-medium text-gray-700 py-2"
               >
                 Title
               </label>
@@ -47,11 +90,11 @@ export default function Product(){
               />
             </div>
           </div>
-          <div class="mx-auto my-4">
+          <div className="mx-auto my-4">
             <div>
               <label
                 for="example1"
-                class="mb-1 block text-lg font-medium text-gray-700 py-2"
+                className="mb-1 block text-lg font-medium text-gray-700 py-2"
               >
                 Select Category
               </label>
@@ -62,24 +105,24 @@ export default function Product(){
               </select>
             </div>
           </div>
-          <div class="mx-auto my-4">
-            <div class="mx-auto">
+          <div className="mx-auto my-4">
+            <div className="mx-auto">
               <label
                 for="example1"
-                class="mb-1 block text-lg font-medium text-gray-700 py-2"
+                className="mb-1 block text-lg font-medium text-gray-700 py-2"
               >
                 Images
               </label>
-              <label class="flex w-full cursor-pointer appearance-none items-center justify-center rounded-md border-2 border-dashed border-teal-300 p-6 transition-all hover:border-primary-300">
-                <div class="space-y-1 text-center">
-                  <div class="mx-auto inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
+              <label className="flex w-full cursor-pointer appearance-none items-center justify-center rounded-md border-2 border-dashed border-teal-300 p-6 transition-all hover:border-primary-300">
+                <div className="space-y-1 text-center">
+                  <div className="mx-auto inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke-width="1.5"
                       stroke="currentColor"
-                      class="h-6 w-6 text-gray-500"
+                      className="h-6 w-6 text-gray-500"
                     >
                       <path
                         stroke-linecap="round"
@@ -88,28 +131,80 @@ export default function Product(){
                       />
                     </svg>
                   </div>
-                  <div class="text-gray-600">
+                  <div className="text-gray-600">
                     <a
                       href="#"
-                      class="font-medium text-primary-500 hover:text-primary-700"
+                      className="font-medium text-primary-500 hover:text-primary-700"
                     >
                       Click to upload
                     </a>{" "}
                     or drag and drop
                   </div>
-                  <p class="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500">
                     SVG, PNG, JPG or GIF (max. 800x400px)
                   </p>
                 </div>
-                <input id="example5" type="file" class="sr-only" />
+                <input
+                  id="fileInput"
+                  type="file"
+                  className="hidden"
+                  accept="images/*"
+                  multiple
+                  onChange={uploadImages}
+                />
               </label>
             </div>
           </div>
-          <div class="mx-auto my-4">
+          <div className="grid grid-cols-2 items-center rounded">
+            {isUploading && (
+              <Spinner className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+            )}
+          </div>
+          {!isUploading && (
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 mb-2">
+              <ReactSortable
+                list={Array.isArray(images) ? images : []}
+                animation={200}
+                setList={updateImagesOrder}
+                className="w-[350px] h-auto gap-2 flex justify-between align-items-center"
+              >
+                {Array.isArray(images) &&
+                  images.map((link, index) => (
+                    <div key={link} className="relative group">
+                      <img
+                        src={link}
+                        alt="image"
+                        className="object-cover h-32 w-44 rounded-md border p-2 cursor-pointer transition-transform transform-gpu group-hover:scale-105"
+                      />
+
+                      <div className="absolute top-2 right-2 cursor-pointer group-hover:opacity-100 opacity-0 transition-opacity">
+                        <button onClick={() => handleDeleteImage(index)}>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="size-6"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+              </ReactSortable>
+            </div>
+          )}
+          <div className="mx-auto my-4">
             <div>
               <label
                 for="example1"
-                class="mb-1 block text-lg font-medium text-gray-700 py-2"
+                className="mb-1 block text-lg font-medium text-gray-700 py-2"
               >
                 Description
               </label>
@@ -124,11 +219,11 @@ export default function Product(){
               ></textarea>
             </div>
           </div>
-          <div class="mx-auto my-4">
+          <div className="mx-auto my-4">
             <div>
               <label
                 for="example1"
-                class="mb-1 block text-lg font-medium text-gray-700 py-2"
+                className="mb-1 block text-lg font-medium text-gray-700 py-2"
               >
                 Price
               </label>
@@ -142,7 +237,7 @@ export default function Product(){
               />
             </div>
           </div>
-          <div class="mx-auto my-4">
+          <div className="mx-auto my-4">
             <div>
               <button
                 className="inline-block rounded border border-teal-600 bg-teal-600 px-12 py-3 text-sm font-medium text-white hover:bg-transparent hover:text-teal-600 focus:outline-none focus:ring active:text-teal-500 w-full"

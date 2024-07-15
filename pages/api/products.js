@@ -7,11 +7,18 @@ export default async function handle(req, res) {
     await mongooseConnect();
 
     if (method === 'POST') {
-        const {title, description, price} = req.body
+        const {title, description, price, images} = req.body
 
         const productDoc = await Product.create({
-            title, description, price
+            title, description, price, images
         })
         res.json(productDoc)
+    }
+
+    if (method === 'DELETE') {
+        if(req.query.id) {
+            await Product.deleteOne({_id: req.query.id});
+            req.json(true);
+        }
     }
 }
