@@ -4,15 +4,21 @@ import { useState } from "react";
 import Spinner from "./Spinner";
 import { ReactSortable } from "react-sortablejs"
 
-export default function Product(){
+export default function Product({
+  _id,
+  title: existingTitle,
+  description: existingDescription,
+  price: existingPrice,
+  images: existingImages,
+}){
 
   const router = useRouter();
 
   const [redirect,setRedirect] = useState(false);
-  const [title, setTitle ] = useState("") ;
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [images, setImages] = useState([]);
+  const [title, setTitle ] = useState(existingTitle|| "") ;
+  const [description, setDescription] = useState(existingDescription || "");
+  const [price, setPrice] = useState(existingPrice || "");
+  const [images, setImages] = useState(existingImages || []);
 
   const [isUploading, setIsUploading] = useState(false)
 
@@ -26,7 +32,12 @@ export default function Product(){
     }
 
     const data = {title, description, price, images};
-    await axios.post('/api/products', data);
+
+    if (_id) {
+      await axios.put('/api/products', {...data, _id});
+    } else {
+      await axios.post("/api/products", data);
+    }
 
     setRedirect(true);
   };
@@ -37,10 +48,10 @@ export default function Product(){
       setIsUploading(true);
       for (const file of files) {
         const data = new FormData();
-        data.append("file", file);
+        data.append('file', file);
 
         uploadImagesQueue.push(
-          axios.post("/api/upload", data).then((res) => {
+          axios.post('/api/upload', data).then((res) => {
             setImages((oldImages) => [...oldImages, ...res.data.links]);
           })
         );
