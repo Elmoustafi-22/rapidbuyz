@@ -148,6 +148,7 @@ export default function Product({
                   </div>
                   <div className="text-gray-600">
                     <Link
+                      href="#"
                       className="font-medium text-primary-500 hover:text-primary-700"
                     >
                       Click to upload
