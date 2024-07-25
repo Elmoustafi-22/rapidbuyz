@@ -17,7 +17,7 @@ export default function Home() {
                  </h1>
 
                  <p className="mt-1.5 text-md text-gray-500">
-                   View your business statistics. Also add and manage products🎉
+                  Add and manage products🎉
                  </p>
                </div>
 
@@ -68,13 +68,6 @@ export default function Home() {
              </div>
            </div>
          </header>
-
-         <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 lg:gap-8">
-           <div className="h-32 rounded-lg bg-gray-200"></div>
-           <div className="h-32 rounded-lg bg-gray-200"></div>
-           <div className="h-32 rounded-lg bg-gray-200"></div>
-           <div className="h-32 rounded-lg bg-gray-200"></div>
-         </div>
        </>
      );
    }
