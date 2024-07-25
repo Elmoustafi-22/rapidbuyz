@@ -146,12 +146,11 @@ export default function Product({
                     </svg>
                   </div>
                   <div className="text-gray-600">
-                    <a
-                      href="#"
+                    <Link
                       className="font-medium text-primary-500 hover:text-primary-700"
                     >
                       Click to upload
-                    </a>{" "}
+                    </Link>{" "}
                     or drag and drop
                   </div>
                   <p className="text-sm text-gray-500">
