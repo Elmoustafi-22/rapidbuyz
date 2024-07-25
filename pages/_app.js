@@ -1,7 +1,7 @@
 import "@/styles/globals.css";
 import { Raleway } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
-import Header from "@/components/Header";
+import Header from "./components/Header";
 import { Toaster } from "react-hot-toast";
 
 const inter = Raleway({ subsets: ["latin"], weight: "400" });
