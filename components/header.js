@@ -21,7 +21,9 @@ export default function Header() {
           <div className="lg:px-8">
             <div className="flex h-16 items-center justify-between">
               <div className="flex-1 md:flex md:items-center md:gap-12">
-                <a className="block text-teal-600" href="#">
+                <Link
+                  href="/" 
+                  className="block text-teal-600">
                   <span className="sr-only">Home</span>
                   <svg
                     class="h-8 w-8 text-teal-500"
@@ -36,7 +38,7 @@ export default function Header() {
                       d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
                     />
                   </svg>
-                </a>
+                </Link>
               </div>
 
               <div className="md:flex md:items-center md:gap-12">
@@ -45,7 +47,7 @@ export default function Header() {
                     <li>
                       <Link
                         className={location.pathname === '/' ? active : inactive}
-                        href="#"
+                        href="/"
                       >
                         {" "}
                         Dashboard{" "}
@@ -54,7 +56,7 @@ export default function Header() {
                     <li>
                       <Link
                         className={location.pathname === '/products' ? active : inactive}
-                        href="#"
+                        href="/products"
                       >
                         {" "}
                         Products{" "}
@@ -63,7 +65,7 @@ export default function Header() {
                     <li>
                       <Link
                         className={location.pathname === '/categories' ? active : inactive}
-                        href="#"
+                        href="/categories"
                       >
                         {" "}
                         Categories{" "}
@@ -72,7 +74,7 @@ export default function Header() {
                     <li>
                       <Link
                         className={location.pathname === '/orders' ? active : inactive}
-                        href="#"
+                        href="/orders"
                       >
                         {" "}
                         Orders{" "}

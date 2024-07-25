@@ -1,10 +1,10 @@
 import "@/styles/globals.css";
-import { Playfair_Display } from "next/font/google";
+import { Raleway } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
 import Header from "../components/Header";
 import { Toaster } from "react-hot-toast";
 
-const inter = Playfair_Display({ subsets: ["latin"], weight: "400" });
+const inter = Raleway({ subsets: ["latin"], weight: "400" });
 
 export default function App({ Component, pageProps: { session, ...pageProps } }) {
   return (
